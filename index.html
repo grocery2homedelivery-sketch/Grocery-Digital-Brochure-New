@@ -1,13 +1,20 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Grocery2Home Interactive Booklet</title>
+
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
-            padding: 0;
+            padding: 20px 12px;
             background-color: #1a1a1a;
             font-family: Arial, sans-serif;
             display: flex;
@@ -17,131 +24,326 @@
             min-height: 100vh;
             color: #fff;
         }
+
+        h1 {
+            font-size: 24px;
+            text-align: center;
+            margin: 0 0 20px;
+            color: #ffcc00;
+        }
+
         .book-container {
             position: relative;
             width: 90vw;
-            max-width: 500px;
-            height: 75vw;
-            max-height: 700px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            max-width: 700px;
+            height: min(75vh, 900px);
+            min-height: 350px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
             background: #000;
             border-radius: 8px;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+            touch-action: pan-y;
         }
+
         .page {
             position: absolute;
+            inset: 0;
             width: 100%;
             height: 100%;
             display: none;
             object-fit: contain;
-            transition: opacity 0.5s ease-in-out;
+            background: #000;
         }
+
         .page.active {
             display: block;
         }
+
+        .page-error {
+            display: none;
+            position: absolute;
+            left: 15px;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: center;
+            color: #ffcc00;
+            font-size: 15px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
         .controls {
             margin-top: 20px;
             display: flex;
-            gap: 15px;
+            gap: 12px;
             align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
         }
+
         button {
             background-color: #ffcc00;
             border: none;
             color: #000;
-            padding: 10px 20px;
+            padding: 12px 18px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 5px;
             cursor: pointer;
-            transition: background 0.2s;
         }
+
         button:hover {
             background-color: #e6b800;
         }
+
+        button:focus-visible {
+            outline: 3px solid #fff;
+            outline-offset: 3px;
+        }
+
         .page-indicator {
             font-size: 16px;
             font-weight: bold;
             color: #ccc;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .hint {
+            margin-top: 12px;
+            color: #aaa;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 16px 8px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .book-container {
+                width: 96vw;
+                height: 68vh;
+                min-height: 300px;
+            }
+
+            .controls {
+                gap: 8px;
+            }
+
+            button {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            .page-indicator {
+                min-width: 90px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
+
 <body>
 
+    <h1>Grocery2Home Interactive Booklet</h1>
+
     <div class="book-container" id="bookContainer">
-        <!-- Change the extensions (.png, .jpg, .jpeg) below to match what each file actually is -->
-        <img src="page1.png" class="page active" alt="Page 1">
-        <img src="page2.png" class="page" alt="Page 2">
-        <img src="page3.png" class="page" alt="Page 3">
-        <img src="page4.png" class="page" alt="Page 4">
-        <img src="page5.png" class="page" alt="Page 5">
-        <img src="page6.png" class="page" alt="Page 6">
-        <img src="page7.png" class="page" alt="Page 7">
-        <img src="page8.png" class="page" alt="Page 8">
-        <img src="page9.png" class="page" alt="Page 9">
-        <img src="page10.png" class="page" alt="Page 10">
-        <img src="page11.png" class="page" alt="Page 11">
-        <img src="page12.png" class="page" alt="Page 12">
+
+        <!-- Pages 1 to 9 -->
+        <img src="page1.png" class="page active"
+             alt="Page 1" data-page="1">
+
+        <img src="page2.png" class="page"
+             alt="Page 2" data-page="2">
+
+        <img src="page3.png" class="page"
+             alt="Page 3" data-page="3">
+
+        <img src="page4.png" class="page"
+             alt="Page 4" data-page="4">
+
+        <img src="page5.png" class="page"
+             alt="Page 5" data-page="5">
+
+        <img src="page6.png" class="page"
+             alt="Page 6" data-page="6">
+
+        <img src="page7.png" class="page"
+             alt="Page 7" data-page="7">
+
+        <img src="page8.png" class="page"
+             alt="Page 8" data-page="8">
+
+        <img src="page9.png" class="page"
+             alt="Page 9" data-page="9">
+
+        <!-- Page 10: repository screenshot shows .jfif -->
+        <img src="page10.jfif" class="page"
+             alt="Page 10" data-page="10">
+
+        <!-- Make sure these filenames match your GitHub repository -->
+        <img src="page11.png" class="page"
+             alt="Page 11" data-page="11">
+
+        <img src="page12.png" class="page"
+             alt="Page 12" data-page="12">
+
+        <div class="page-error" id="pageError" role="alert">
+            This page image could not be loaded.
+            Please check the filename and extension in your GitHub repository.
+        </div>
+
     </div>
 
     <div class="controls">
-        <button id="prevBtn" onclick="changePage(-1)">Previous</button>
-        <span class="page-indicator" id="pageIndicator">Page 1 of 10</span>
-        <button id="nextBtn" onclick="changePage(1)">Next</button>
+
+        <button id="prevBtn" type="button">
+            Previous
+        </button>
+
+        <span class="page-indicator"
+              id="pageIndicator"
+              aria-live="polite">
+            Page 1 of 12
+        </span>
+
+        <button id="nextBtn" type="button">
+            Next
+        </button>
+
     </div>
+
+    <p class="hint">
+        Use Previous / Next or swipe left and right on your phone.
+    </p>
 
     <script>
         let currentIndex = 0;
-        const pages = document.querySelectorAll('.page');
-        const indicator = document.getElementById('pageIndicator');
+
+        const pages = Array.from(
+            document.querySelectorAll(".page")
+        );
+
+        const indicator = document.getElementById("pageIndicator");
+        const pageError = document.getElementById("pageError");
+        const container = document.getElementById("bookContainer");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
 
         function updateBook() {
             pages.forEach((page, index) => {
-                page.classList.remove('active');
-                if (index === currentIndex) {
-                    page.classList.add('active');
+                page.classList.toggle(
+                    "active",
+                    index === currentIndex
+                );
+            });
+
+            indicator.textContent =
+                `Page ${currentIndex + 1} of ${pages.length}`;
+
+            checkCurrentImage();
+        }
+
+        function checkCurrentImage() {
+            const page = pages[currentIndex];
+
+            if (page.complete && page.naturalWidth === 0) {
+                pageError.style.display = "block";
+                pageError.textContent =
+                    `Page ${currentIndex + 1} image could not load. ` +
+                    `Check the filename: ${page.getAttribute("src")}`;
+            } else {
+                pageError.style.display = "none";
+            }
+        }
+
+        pages.forEach((page) => {
+            page.addEventListener("error", () => {
+                if (pages[currentIndex] === page) {
+                    checkCurrentImage();
                 }
             });
-            indicator.textContent = `Page ${currentIndex + 1} of ${pages.length}`;
-        }
+
+            page.addEventListener("load", () => {
+                if (pages[currentIndex] === page) {
+                    checkCurrentImage();
+                }
+            });
+        });
 
         function changePage(direction) {
             currentIndex += direction;
+
             if (currentIndex < 0) {
                 currentIndex = pages.length - 1;
-            } else if (currentIndex >= pages.length) {
+            }
+
+            if (currentIndex >= pages.length) {
                 currentIndex = 0;
             }
+
             updateBook();
         }
 
-        // Swipe support for mobile devices
+        prevBtn.addEventListener("click", () => {
+            changePage(-1);
+        });
+
+        nextBtn.addEventListener("click", () => {
+            changePage(1);
+        });
+
+        // Keyboard navigation
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowRight") {
+                changePage(1);
+            } else if (event.key === "ArrowLeft") {
+                changePage(-1);
+            }
+        });
+
+        // Mobile swipe navigation
         let touchStartX = 0;
-        let touchEndX = 0;
+        let touchStartY = 0;
 
-        const container = document.getElementById('bookContainer');
+        container.addEventListener("touchstart", (event) => {
+            touchStartX = event.changedTouches[0].screenX;
+            touchStartY = event.changedTouches[0].screenY;
+        }, { passive: true });
 
-        container.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-        });
+        container.addEventListener("touchend", (event) => {
+            const touchEndX = event.changedTouches[0].screenX;
+            const touchEndY = event.changedTouches[0].screenY;
 
-        container.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
 
-        function handleSwipe() {
-            if (touchEndX < touchStartX - 50) {
-                changePage(1); // Swipe Left -> Next Page
+            // Only change page for a mainly horizontal swipe
+            if (
+                Math.abs(deltaX) > 50 &&
+                Math.abs(deltaX) > Math.abs(deltaY)
+            ) {
+                if (deltaX < 0) {
+                    changePage(1);
+                } else {
+                    changePage(-1);
+                }
             }
-            if (touchEndX > touchStartX + 50) {
-                changePage(-1); // Swipe Right -> Previous Page
-            }
-        }
+        }, { passive: true });
+
+        // Start on page 1
+        updateBook();
     </script>
 
 </body>
 </html>
+```
